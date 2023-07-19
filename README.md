@@ -6,8 +6,10 @@ The ETL process is based on three major kafka components:
 2. kafka connect (with source and sink)
 
 3. ksql – kafka component for streams manipulations, that has data transformation capability
+   
 
 
+   
 The following figure describes the main components of the deployment
 ![image](https://github.com/amitca71/pipeline_mysql_postgres_confluent_ksqldb/assets/5821916/c48cc112-9560-40dc-9cdd-94599332b1c7)
 
@@ -23,6 +25,9 @@ Postgres – used as sink (configuration: jdbc-sink.json)
 Minio –used as S3 sink (configuration s3-minio-sink.json)
 
 ksql- confluent ksql (due to lack of time and memory issues, I couldn’t track why cant be seen of control center). 
+
+kafkacat - command line interaction with the kafka cluster   
+   (complemented with shell script for tombstone kafka connect debezium connectors)   
 
 transformation can be done by gui after system boot on : http://localhost:9021/clusters/c5ziYokZTuO1G9kb8CBZkA/ksql/ksqldb1/editor
 
@@ -237,3 +242,9 @@ Records can also be seen under buckets/topics
 
 This can be be used as a raw data to lakehouse (e.g. can add spark that reads the data and transform it to parquet/delta, etc...)
 
+#### Tumbstone on mysql connector
+in order to force the connector to start the offset from beginning (usualy for testing purposes), need to set tombstone (see https://debezium.io/documentation/faq/#how_to_remove_committed_offsets_for_a_connector).  
+
+execution: docker-compose exec kafkacat python3 tumbersome_connectors.py   
+the kafkacat container can be used for other commands, such as:    
+docker-compose exec kafkacat kafkacat -L -b broker:29092 -t docker-connect-configs   
